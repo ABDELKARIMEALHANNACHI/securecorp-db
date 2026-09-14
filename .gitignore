@@ -1,0 +1,30 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# PostgreSQL / local data
+*.sql.bak
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Reports / generated files
+*.aux
+*.log
+*.out
+
+# Temporary files
+*.tmp
+*.swp
