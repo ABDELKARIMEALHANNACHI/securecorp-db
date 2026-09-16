@@ -1,4 +1,4 @@
-# 🛡️ SecureCorp DB
+#  SecureCorp DB
 
 <p align="center">
   <img src="assets/securecorp-lifecycle.gif" alt="SecureCorp DB lifecycle" width="100%">
@@ -16,7 +16,7 @@ A controlled database security engineering laboratory.</p>
 
 ---
 
-## ⚡ The idea
+##  The idea
 
 SecureCorp DB is not just a database project.
 
