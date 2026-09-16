@@ -1,169 +1,58 @@
-# SecureCorp DB — Build → Breach → Harden
+# 🛡️ SecureCorp DB
 
-> An engineering project that designs, attacks, and hardens a realistic enterprise security database.
+<p align="center">
+  <img src="assets/securecorp-lifecycle.gif" alt="SecureCorp DB lifecycle" width="100%">
+</p>
 
-## Overview
+<p align="center"><strong>BUILD → BREACH → HARDEN</strong><br>
+A controlled database security engineering laboratory.</p>
 
-**SecureCorp DB** is a complete database engineering and security project built around a realistic internal security platform.
+<p align="center">
+<img src="https://img.shields.io/badge/PostgreSQL-18%2B-336791?logo=postgresql&logoColor=white">
+<img src="https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white">
+<img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white">
+<img src="https://img.shields.io/badge/Security-Lab-111827">
+</p>
 
-The project follows a three-phase lifecycle:
+---
+
+## ⚡ The idea
+
+SecureCorp DB is not just a database project.
+
+It is a full engineering loop:
 
 ```text
-┌─────────────────────┐
-│  PHASE 1            │
-│  BUILD              │
-│                     │
-│  Business Model     │
-│       ↓             │
-│  MCD                │
-│       ↓             │
-│  MLD                │
-│       ↓             │
-│  PostgreSQL         │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│  PHASE 2            │
-│  BREACH              │
-│                     │
-│  SQL Injection      │
-│  Race Conditions    │
-│  Privilege Escal.   │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│  PHASE 3            │
-│  HARDEN & PROVE     │
-│                     │
-│  Parameterization   │
-│  Transactions       │
-│  Least Privilege    │
-│  Constraints        │
-│  Performance        │
-│       ↓             │
-│  Retest             │
-└─────────────────────┘
+BUSINESS REQUIREMENTS
+        ↓
+      MCD
+        ↓
+      MLD
+        ↓
+   POSTGRESQL
+        ↓
+ APPLICATION LAYER
+        ↓
+     ATTACK
+        ↓
+  ROOT CAUSE
+        ↓
+    HARDEN
+        ↓
+     RETEST
+        ↓
+      PROVE
 ```
 
-The goal is not simply to build a database or exploit a vulnerable application.
+The system is first designed correctly, then deliberately weakened in a controlled lab, attacked, repaired, and tested again.
 
-The goal is to understand the complete engineering lifecycle:
-
-**design → implementation → vulnerability → exploitation → remediation → verification**
-
-Every vulnerability introduced during the project is intentional, documented, and understood.
+> **Build it. Break it. Understand why it broke. Fix it. Prove that it is fixed.**
 
 ---
 
-## Project Objective
+## 🏢 What is SecureCorp?
 
-The primary objective is to build a realistic PostgreSQL-based security platform and use it as a controlled laboratory for learning both database engineering and cybersecurity.
-
-The project combines:
-
-* Database modeling
-* Merise MCD/MLD
-* Relational database design
-* PostgreSQL
-* SQL
-* Database constraints
-* Normalization
-* Transactions and concurrency
-* Database security
-* SQL Injection
-* Privilege management
-* Performance analysis
-* Python
-* Docker
-* Git/GitHub
-* Security testing
-* Technical documentation
-
-The final result should be a reproducible security laboratory and a professional-style technical report.
-
----
-
-# The System
-
-SecureCorp represents an internal security operations platform.
-
-The database manages information such as:
-
-* Users
-* Roles
-* Permissions
-* Assets
-* Vulnerabilities
-* Incidents
-* Audit logs
-
-These objects form the foundation of the relational model.
-
-The database will later be connected to a small Python application layer. The application will intentionally contain vulnerable implementations during Phase 2 so that the security weaknesses can be demonstrated and exploited in a controlled environment.
-
----
-
-# Why This Project Exists
-
-This project is designed to solve a common problem in technical learning:
-
-> Knowing individual concepts without understanding how they interact inside a real system.
-
-Instead of studying SQL, database modeling, transactions, and security as isolated subjects, this project connects them into one system.
-
-For example:
-
-```text
-Business requirement
-        ↓
-MCD
-        ↓
-MLD
-        ↓
-PostgreSQL schema
-        ↓
-Application
-        ↓
-SQL queries
-        ↓
-Security weakness
-        ↓
-Exploitation
-        ↓
-Fix
-        ↓
-Retest
-```
-
-This makes every technical decision traceable.
-
-A database table should exist because of a business requirement.
-
-A constraint should exist because of a data-integrity rule.
-
-A vulnerability should exist because of a specific implementation decision.
-
-A remediation should address the actual root cause.
-
-A security fix should be verified by repeating the original attack.
-
----
-
-# Phase 1 — Design & Build
-
-## Objective
-
-Build a correctly modeled, constrained PostgreSQL database representing the SecureCorp security platform.
-
-### 1. Business Requirements
-
-Define the system in business terms.
-
-The requirements describe what SecureCorp needs to manage and what relationships exist between its objects.
-
-Main domains:
+SecureCorp represents a fictional internal security platform managing:
 
 ```text
 Users
@@ -175,428 +64,301 @@ Incidents
 Audit Logs
 ```
 
-Deliverable:
+```mermaid
+flowchart LR
+    U[Users] --> R[Roles]
+    R --> P[Permissions]
+    U --> I[Incidents]
+    U --> L[Audit Logs]
+    A[Assets] --> V[Vulnerabilities]
+    V --> I
+    I --> L
+    A --> L
+```
+
+The model is deliberately small enough to reason about and rich enough to produce real database and security problems.
+
+---
+
+# 🟢 Phase 1 — BUILD
+
+### Design before implementation
+
+The project begins with business rules, not random tables created until pgAdmin starts looking worried.
+
+```mermaid
+flowchart LR
+    A[Business Requirements] --> B[MCD]
+    B --> C[MLD]
+    C --> D[PostgreSQL Schema]
+    D --> E[Seed Data]
+    E --> F[Application]
+```
+
+### MCD → MLD → PostgreSQL
+
+The conceptual model defines:
+
+- entities
+- attributes
+- identifiers
+- associations
+- cardinalities
+- N:N relationships
+- association properties
+- historical information
+
+A typical N:N structure becomes an associative relation:
+
+```text
+ROLE  N ───────< ROLE_PERMISSION >─────── N  PERMISSION
+```
+
+The relational model is then implemented with database-level integrity:
+
+```text
+PRIMARY KEY
+FOREIGN KEY
+NOT NULL
+UNIQUE
+CHECK
+```
+
+### Build deliverables
 
 ```text
 docs/business-requirements.md
-```
-
----
-
-## 2. MCD — Conceptual Data Model
-
-Transform the business requirements into a conceptual model using Merise.
-
-The MCD will define:
-
-* Entities
-* Attributes
-* Identifiers
-* Associations
-* Cardinalities
-* N:N relationships
-* Relationship properties
-* Historization
-
-The model must include:
-
-### N:N relationship with properties
-
-A role can have multiple permissions, and a permission can belong to multiple roles.
-
-```text
-ROLE
-  │
-  │ N:N
-  │
-PERMISSION
-```
-
-The association will have its own properties.
-
-### Historization
-
-The system must preserve information about actions performed over time through the audit-log mechanism.
-
-Deliverables:
-
-```text
 docs/mcd.md
-diagrams/mcd.png
-```
-
----
-
-## 3. MLD → PostgreSQL
-
-Transform the MCD into a relational model and then into PostgreSQL `CREATE TABLE` statements.
-
-The schema will use:
-
-* Primary keys
-* Foreign keys
-* NOT NULL
-* UNIQUE
-* CHECK constraints
-
-Deliverable:
-
-```text
-database/schema.sql
-```
-
-The objective is not merely to create tables.
-
-The database itself should enforce as many business rules and integrity rules as reasonably possible.
-
----
-
-## 4. Normalization
-
-The schema will later be analyzed and normalized to Third Normal Form.
-
-Any deliberate denormalization must be documented and justified.
-
-This step is intentionally performed after the corresponding database-design coursework rather than pretending normalization is something you acquire through divine database inspiration.
-
-Deliverable:
-
-```text
+docs/mld.md
 docs/normalization.md
-```
-
----
-
-## 5. Seed Data
-
-The database will eventually contain realistic but entirely fake data.
-
-Target:
-
-```text
-50–200 rows per table
-```
-
-The data should represent realistic distributions rather than perfectly uniform test values.
-
-Deliverable:
-
-```text
+database/schema.sql
 database/seed.sql
+diagrams/mcd.png
+diagrams/mld.png
 ```
-
-No real personal data will be used.
 
 ---
 
-## 6. Docker Environment
+# 🔴 Phase 2 — BREACH
 
-The project will provide a reproducible PostgreSQL environment using Docker Compose.
+The application layer is intentionally vulnerable.
 
-The objective is:
+The goal is not to attack somebody else's infrastructure. The goal is to understand exactly how insecure application/database interactions fail inside our own laboratory.
 
-```bash
-docker compose up
-```
+## 01 · SQL Injection
 
-to create the database environment automatically.
-
-The environment will include:
+Unsafe flow:
 
 ```text
-Docker Compose
-      ↓
-PostgreSQL
-      ↓
-Persistent volume
-      ↓
-Schema initialization
-      ↓
-Seed data
+User Input
+   ↓
+String Concatenation
+   ↓
+SQL Parser
+   ↓
+Unexpected Query
+   ↓
+Database Impact
 ```
 
-Deliverable:
+The lab covers:
+
+- Error-based SQL injection
+- UNION-based SQL injection
+- Boolean-based blind SQL injection
+- Time-based blind SQL injection
+
+Manual exploitation comes first. Automation such as `sqlmap` is used as independent validation.
+
+## 02 · Race Condition
+
+A deliberately unsafe check-then-act operation creates a concurrency window:
 
 ```text
-docker-compose.yml
+Request A ──► SELECT ──► CHECK ──► UPDATE
+Request B ──► SELECT ──► CHECK ──► UPDATE
+                       ▲
+                       │
+                   RACE WINDOW
 ```
 
----
+This connects application behavior to:
 
-# Phase 2 — Breach
+`transactions · MVCC · isolation · locking · concurrency`
 
-## Objective
+## 03 · Excessive Privileges
 
-Attack the system we built.
-
-The vulnerabilities are intentionally introduced into a small Python application layer.
-
-The purpose is not to attack third-party systems.
-
-The purpose is to understand exactly how insecure database/application interactions become exploitable.
-
----
-
-## SQL Injection
-
-The vulnerable application will initially use deliberately unsafe string-concatenated SQL queries.
-
-Examples of functionality include:
-
-* Login
-* Incident search
-* Asset lookup
-
-The project will demonstrate:
-
-* Error-based SQL injection
-* UNION-based SQL injection
-* Boolean-based blind SQL injection
-* Time-based blind SQL injection
-
-Manual exploitation will be performed first.
-
-`sqlmap` may then be used as an independent validation tool.
-
----
-
-## Race Condition
-
-A deliberately vulnerable check-then-act workflow will be created.
-
-Conceptually:
+The application initially receives more database permissions than it actually needs:
 
 ```text
-SELECT balance
-      ↓
-check balance
-      ↓
-UPDATE balance
+                APPLICATION
+                     │
+                     ▼
+          OVER-PERSONED DB ACCOUNT
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+        READ       WRITE     SENSITIVE
+                             MODIFICATION
 ```
 
-Multiple concurrent requests will attempt to exploit the time window between the check and the update.
-
-A Python concurrency script will be used to demonstrate the problem.
-
-This section is particularly important because it connects:
-
-```text
-Transactions
-Isolation
-MVCC
-Concurrency
-Application logic
-Database locking
-```
+The experiment demonstrates how a weak privilege boundary can increase the impact of application compromise.
 
 ---
 
-## Privilege Escalation
+# 🔵 Phase 3 — HARDEN
 
-The project will deliberately configure an over-permissioned database application account.
+Hardening is not a sentence in a report saying “fixed.”
 
-The objective is to demonstrate how excessive database privileges can turn application compromise into broader database access.
+The original attack is repeated.
 
-For example, an application account that should not modify audit logs may nevertheless be granted enough permissions to do so.
-
----
-
-## Attack Documentation
-
-Every vulnerability will be documented with:
-
-* Scope
-* Preconditions
-* Reproduction steps
-* Technical explanation
-* Evidence
-* Impact
-* Remediation
-
-The objective is to produce evidence that another engineer can reproduce.
-
----
-
-# Phase 3 — Harden & Prove
-
-## Objective
-
-Fix the vulnerabilities and prove that the fixes work.
-
-This phase is deliberately different from simply saying:
-
-> "The vulnerability is fixed."
-
-The project will repeat the same attacks against the hardened system.
-
-```text
-Vulnerable
-    ↓
-Exploit
-    ↓
-Evidence
-    ↓
-Root cause
-    ↓
-Remediation
-    ↓
-Same exploit
-    ↓
-Blocked
-    ↓
-Evidence
+```mermaid
+flowchart LR
+    A[Vulnerable] --> B[Exploit]
+    B --> C[Evidence]
+    C --> D[Root Cause]
+    D --> E[Remediation]
+    E --> F[Repeat Attack]
+    F --> G[Blocked / Controlled]
+    G --> H[Proof]
 ```
 
----
+### SQL Injection → Parameterized SQL
 
-## SQL Injection Remediation
-
-Replace unsafe string concatenation with parameterized SQL statements.
-
-Conceptually:
-
-```text
-User input
-    ↓
-Parameterized query
-    ↓
-Database
+```python
+query = "SELECT * FROM users WHERE name = %s"
+cursor.execute(query, (username,))
 ```
 
-instead of:
+The important thing is not the syntax. It is the separation between **data** and **SQL instructions**.
 
-```text
-User input
-    ↓
-String concatenation
-    ↓
-SQL parser
-```
+### Race Condition → Transactional Protection
 
-The original exploit will then be repeated to verify that the attack no longer works.
-
----
-
-## Race Condition Remediation
-
-The vulnerable check-then-act operation will be redesigned using appropriate transactional protection.
-
-Possible mechanisms include:
-
-* Transactions
-* `SELECT ... FOR UPDATE`
-* Appropriate isolation levels
-
-The same concurrency script will be executed again.
-
-Expected result:
-
-```text
-Before:
-20 concurrent requests
-       ↓
-Multiple successful redemptions
-
-After:
-20 concurrent requests
-       ↓
-Database synchronization
-       ↓
-Only valid redemption
-```
-
----
-
-## Least Privilege
-
-Database roles will be redesigned around the minimum permissions required by each application component.
+Depending on the state transition, the hardened implementation may use transactions, row locking, or an appropriate isolation strategy.
 
 Example:
 
+```sql
+BEGIN;
+
+SELECT ...
+FOR UPDATE;
+
+UPDATE ...;
+
+COMMIT;
+```
+
+### Excessive Privilege → Least Privilege
+
 ```text
 app_readonly
+    ↓
+read-only operations
+
 app_write
+    ↓
+required DML only
+
 app_admin
+    ↓
+restricted administrative tasks
 ```
 
-The application will use the least-privileged account appropriate for its operation.
+Each account should receive only the permissions necessary for its role.
 
 ---
 
-## Defense in Depth
+# 🧱 Defense in Depth
 
-Database constraints will be strengthened where necessary.
+The application is not the only security boundary.
 
-Examples:
+The database also protects its own state:
 
 ```text
-NOT NULL
-CHECK
-UNIQUE
-FOREIGN KEY
+Application Controls
+        +
+Database Constraints
+        +
+Transactions
+        +
+Locks
+        +
+Roles / Privileges
+        ↓
+Defense in Depth
 ```
 
-The principle is:
+The principle is simple:
 
-> Even if the application contains a bug, the database should still prevent invalid states whenever possible.
+> **An application bug should not automatically become a valid database state.**
 
 ---
 
-# Performance Validation
+# 🔬 Performance Validation
 
-Security changes should not automatically become an excuse to ignore performance.
+Security controls are tested without pretending performance is someone else's problem.
 
-Key queries will be analyzed using:
+Key queries will be examined with:
 
 ```sql
 EXPLAIN ANALYZE
 ```
 
-The project will compare relevant queries before and after hardening.
+Changes are driven by measurement:
 
-If necessary, indexes will be introduced based on evidence rather than guesswork.
+```text
+Measure
+  ↓
+Observe
+  ↓
+Reason
+  ↓
+Change
+  ↓
+Re-measure
+```
 
----
-
-# Technology Stack
-
-## Database
-
-* PostgreSQL
-
-## Application
-
-* Python
-* Flask or a minimal CLI
-* psycopg2 or psycopg3
-
-## Infrastructure
-
-* Docker
-* Docker Compose
-
-## Security Testing
-
-* Manual SQL injection testing
-* sqlmap
-* Burp Suite Community when HTTP endpoints are used
-
-## Database Tools
-
-* `psql`
-* pgAdmin or DBeaver
-
-## Development
-
-* Git
-* GitHub
-* Markdown
-
-All primary project tools are free/open-source.
+Indexes are introduced when evidence supports them, not because a project contains the word “database.”
 
 ---
 
-# Repository Structure
+# 🧪 Laboratory Boundaries
+
+All offensive testing is designed for the local, intentionally vulnerable environment.
+
+```text
+localhost / private lab
+        ↓
+fictional data
+        ↓
+intentional vulnerabilities
+        ↓
+controlled evidence
+```
+
+No real personal data or third-party infrastructure is required.
+
+---
+
+# 🛠️ Stack
+
+| Layer | Technology |
+|---|---|
+| Database | PostgreSQL |
+| Application | Python + Flask / minimal CLI |
+| Driver | psycopg / psycopg2 |
+| Infrastructure | Docker + Docker Compose |
+| DB clients | `psql`, pgAdmin, DBeaver |
+| Security testing | Manual testing, sqlmap |
+| HTTP testing | Burp Suite Community |
+| Modeling | Merise MCD / MLD |
+| Version control | Git + GitHub |
+| Documentation | Markdown |
+
+---
+
+# 📁 Repository
 
 ```text
 securecorp-db/
@@ -610,8 +372,8 @@ securecorp-db/
 │   ├── business-requirements.md
 │   ├── mcd.md
 │   ├── mld.md
-│   ├── decisions.md
-│   └── normalization.md
+│   ├── normalization.md
+│   └── decisions.md
 │
 ├── database/
 │   ├── schema.sql
@@ -622,207 +384,161 @@ securecorp-db/
 │   └── mld.png
 │
 ├── app/
-│
 ├── exploits/
-│
-└── report/
+├── tests/
+├── report/
+└── assets/
+    └── securecorp-lifecycle.gif
 ```
-
-The repository will evolve as the project progresses.
 
 ---
 
-# Learning Objectives
+# 🚀 Run the Lab
 
-This project is designed to develop several levels of engineering ability.
+Once the environment is implemented:
+
+```bash
+git clone <repository-url>
+cd securecorp-db
+cp .env.example .env
+docker compose up -d
+docker compose ps
+```
+
+Then connect to PostgreSQL with the configured credentials.
+
+The exact environment variables, ports, startup sequence, and initialization behavior will live in the repository documentation.
+
+---
+
+# 📊 What the project proves
+
+```text
+                 SECURECORP DB
+                       │
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼
+      DESIGN         ATTACK         DEFENSE
+        │              │              │
+     MCD / MLD      SQLi / Race     Params / TX
+        │           Privilege Esc.   Least Priv.
+        └──────────────┼──────────────┘
+                       ▼
+                    RETEST
+                       │
+                       ▼
+                     PROOF
+```
+
+The final result should let another engineer clone the project, understand the model, run the vulnerable lab, reproduce the documented issues, inspect the fixes, and verify the hardened state.
+
+---
+
+# 🎓 Learning Objectives
 
 ## Database Engineering
 
-Understand how to:
-
-* Translate business requirements into data models
-* Build MCDs
-* Transform MCD → MLD
-* Design relational schemas
-* Select appropriate keys
-* Model cardinalities
-* Handle N:N relationships
-* Model historical information
-* Normalize relational data
-* Enforce integrity through constraints
-* Write PostgreSQL DDL
-* Generate realistic data
-* Analyze query performance
+Requirements analysis, Merise MCD/MLD, relational design, keys, cardinalities, N:N relationships, historization, normalization, PostgreSQL DDL, integrity constraints, realistic seed data, and query analysis.
 
 ## SQL
 
-Develop practical ability with:
-
-* SELECT
-* JOIN
-* GROUP BY
-* Subqueries
-* CASE
-* CTEs
-* Window functions
-* Transactions
-* Locking
-* `EXPLAIN ANALYZE`
+`SELECT` · `JOIN` · `GROUP BY` · subqueries · `CASE` · CTEs · window functions · transactions · locking · `EXPLAIN ANALYZE`
 
 ## Cybersecurity
 
-Understand database/application vulnerabilities through direct experimentation:
+SQL injection, blind SQL injection, race conditions, excessive database privileges, application/database trust boundaries, and integrity failures.
 
-* SQL Injection
-* Blind SQL Injection
-* Race Conditions
-* Privilege Escalation
-* Excessive database privileges
-* Weak integrity enforcement
+## Defensive Engineering
 
-## Defensive Security
-
-Learn how to:
-
-* Parameterize SQL queries
-* Design secure transactions
-* Control concurrency
-* Apply least privilege
-* Use database constraints as defense in depth
-* Verify remediation through retesting
-
-## Engineering Practice
-
-Develop:
-
-* Git workflow
-* Repository organization
-* Docker-based reproducibility
-* Technical documentation
-* Security evidence collection
-* Reproducible testing
-* Professional reporting
+Parameterized SQL, transactional protection, least privilege, constraints, defense in depth, and security regression testing.
 
 ---
 
-# Project Philosophy
-
-The central philosophy of SecureCorp DB is:
-
-> **Build it. Break it. Understand why it broke. Fix it. Prove that it is fixed.**
-
-The project therefore treats security as part of engineering rather than something added at the end.
-
-A secure system requires more than secure code.
-
-It requires:
+# 🧭 Milestones
 
 ```text
-Correct requirements
-        +
-Correct data model
-        +
-Correct relational design
-        +
-Correct constraints
-        +
-Correct application logic
-        +
-Correct database permissions
-        +
-Correct transaction handling
-        +
-Testing
-        +
-Evidence
+01  BUSINESS MODEL
+      ↓
+02  MCD / MLD
+      ↓
+03  POSTGRES LIVE
+      ↓
+04  SEED DATA
+      ↓
+05  VULNERABLE APP
+      ↓
+06  FIRST EXPLOIT
+      ↓
+07  RACE CONDITION
+      ↓
+08  PRIVILEGE ESCALATION
+      ↓
+09  HARDENING
+      ↓
+10  RETEST
+      ↓
+11  PERFORMANCE
+      ↓
+12  FINAL REPORT
 ```
 
 ---
 
-# Project Milestones
+# ✅ Definition of Done
 
-### M1 — Schema Live
+The project is complete when another engineer can:
 
-Docker Compose starts the PostgreSQL environment and initializes the database.
+```text
+clone
+  ↓
+start
+  ↓
+inspect
+  ↓
+understand
+  ↓
+exploit
+  ↓
+collect evidence
+  ↓
+harden
+  ↓
+retest
+  ↓
+measure
+  ↓
+verify
+```
 
-### M2 — First Successful Exploit
+The finish line is therefore not “the tables exist.”
 
-A SQL injection vulnerability is manually exploited against the intentionally vulnerable application.
-
-### M3 — Race Condition Proven
-
-Concurrent requests demonstrate the vulnerable check-then-act behavior.
-
-### M4 — Full Attack Chain
-
-SQL injection, race condition, and privilege escalation are documented.
-
-### M5 — Hardened Version Passes
-
-The same attacks are executed again and demonstrated to fail after remediation.
-
-### M6 — Report & Repository Published
-
-The final report, documentation, architecture, and reproducible environment are published.
+It is **reproducibility + exploitation + remediation + verification**.
 
 ---
 
-# Current Status
-
-## Completed
-
-* Bloc A — Database fundamentals
-* Bloc B — Merise and relational modeling
-* Initial Git repository structure
-* GitHub repository initialization
-
-## In Progress
-
-* Business requirements
-* MCD
-* MLD
-* PostgreSQL schema
-* Docker Compose environment
-
-## Planned
-
-* SQL seed data
-* Normalization
-* Vulnerable application
-* SQL injection laboratory
-* Race-condition laboratory
-* Privilege escalation laboratory
-* Database hardening
-* Performance validation
-* Final security report
-* Repository publication
-
----
-
-# Expected Final Result
-
-At completion, this repository should provide a reproducible security engineering laboratory where another person can clone the project, start the environment, understand the architecture, reproduce the vulnerabilities, examine the remediation, and verify the final hardened state.
-
-The final deliverable is therefore not just:
+# 🔐 Final Principle
 
 ```text
-a database
+DESIGN
+  ↓
+IMPLEMENT
+  ↓
+MEASURE
+  ↓
+BREAK
+  ↓
+UNDERSTAND
+  ↓
+HARDEN
+  ↓
+RETEST
+  ↓
+PROVE
 ```
 
-It is:
+> **The database is the system.**  
+> **The attack is the experiment.**  
+> **The fix is the engineering.**  
+> **The retest is the proof.**
 
-```text
-Database Engineering
-        +
-Application Security
-        +
-Offensive Testing
-        +
-Defensive Engineering
-        +
-Performance Analysis
-        +
-Professional Documentation
-```
-
-The project directly exercises the database concepts covered throughout the corresponding Domaine 3 blocks, including modeling, SQL, normalization, transactions, PostgreSQL internals, and database security.
+<p align="center"><sub>SecureCorp DB · Build → Breach → Harden</sub></p>
