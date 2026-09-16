@@ -1,401 +1,434 @@
-#  SecureCorp DB
+<div align="center">
 
-<p align="center">
-  <img src="assets/securecorp-lifecycle.gif" alt="SecureCorp DB lifecycle" width="100%">
-</p>
+```
+ ██████╗ ███████╗ ██████╗██╗   ██╗██████╗ ███████╗
+ ██╔════╝ ██╔════╝██╔════╝██║   ██║██╔══██╗██╔════╝
+ ██║  ███╗█████╗  ██║     ██║   ██║██████╔╝█████╗
+ ██║   ██║██╔══╝  ██║     ██║   ██║██╔══██╗██╔══╝
+ ╚██████╔╝███████╗╚██████╗╚██████╔╝██║  ██║███████╗
+  ╚═════╝ ╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝
+         C O R P   ·   D B   S E C U R I T Y   L A B
+```
 
-<p align="center"><strong>BUILD → BREACH → HARDEN</strong><br>
-A controlled database security engineering laboratory.</p>
+### `BUILD` → `BREACH` → `HARDEN`
 
-<p align="center">
-<img src="https://img.shields.io/badge/PostgreSQL-18%2B-336791?logo=postgresql&logoColor=white">
-<img src="https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white">
-<img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white">
-<img src="https://img.shields.io/badge/Security-Lab-111827">
-</p>
+**A controlled database security engineering laboratory — design a real schema, attack it, understand why it broke, fix it, and prove the fix.**
+
+<br>
+
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18%2B-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-App%20Layer-000000?style=for-the-badge&logo=flask&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Phase%201%20·%20Build-yellow?style=for-the-badge)
+![Security Lab](https://img.shields.io/badge/Type-Offensive%20%2B%20Defensive%20Lab-critical?style=for-the-badge)
+
+<sub>⚠️ Static badges above are safe to keep as-is. If you want live GitHub stats (stars, last commit, issues), replace <code>OWNER/REPO</code> in the badge URLs at the bottom of this file with your actual GitHub path.</sub>
+
+</div>
+
+<br>
 
 ---
 
-##  The idea
+## 📑 Table of Contents
 
-SecureCorp DB is not just a database project.
+- [The Idea](#-the-idea)
+- [What is SecureCorp?](#-what-is-securecorp)
+- [Data Model](#-data-model)
+- [Repository Structure](#-repository-structure)
+- [Phase 1 — Build](#-phase-1--build)
+- [Phase 2 — Breach](#-phase-2--breach)
+- [Phase 3 — Harden](#-phase-3--harden)
+- [Defense in Depth](#-defense-in-depth)
+- [Performance Validation](#-performance-validation)
+- [Tech Stack](#️-tech-stack)
+- [Running the Lab](#-running-the-lab)
+- [Learning Objectives](#-learning-objectives)
+- [Roadmap](#-roadmap)
+- [Definition of Done](#-definition-of-done)
+- [Final Principle](#-final-principle)
 
-It is a full engineering loop:
+---
 
-```text
-BUSINESS REQUIREMENTS
-        ↓
-      MCD
-        ↓
-      MLD
-        ↓
-   POSTGRESQL
-        ↓
- APPLICATION LAYER
-        ↓
-     ATTACK
-        ↓
-  ROOT CAUSE
-        ↓
-    HARDEN
-        ↓
-     RETEST
-        ↓
-      PROVE
+## 💡 The Idea
+
+SecureCorp DB is not a schema demo. It is a closed engineering loop, run twice — once broken, once fixed — with evidence at every step.
+
+```mermaid
+flowchart LR
+    A[Business\nRequirements] --> B[MCD]
+    B --> C[MLD]
+    C --> D[(PostgreSQL)]
+    D --> E[Application\nLayer]
+    E --> F{{Attack}}
+    F --> G[Root Cause]
+    G --> H[Harden]
+    H --> I[Retest]
+    I --> J([Proof])
+
+    style F fill:#ef4444,color:#fff,stroke:#7f1d1d
+    style J fill:#22c55e,color:#fff,stroke:#14532d
 ```
 
-The system is first designed correctly, then deliberately weakened in a controlled lab, attacked, repaired, and tested again.
-
 > **Build it. Break it. Understand why it broke. Fix it. Prove that it is fixed.**
+
+Every vulnerability in this lab is introduced deliberately, exploited manually first, documented with evidence, then remediated and re-tested against the exact same exploit. Nothing is "fixed" without a passing regression test to prove it.
 
 ---
 
 ## 🏢 What is SecureCorp?
 
-SecureCorp represents a fictional internal security platform managing:
-
-```text
-Users
-Roles
-Permissions
-Assets
-Vulnerabilities
-Incidents
-Audit Logs
-```
+A fictional internal security platform — small enough to reason about fully, realistic enough to produce genuine database and application security problems.
 
 ```mermaid
 flowchart LR
-    U[Users] --> R[Roles]
-    R --> P[Permissions]
-    U --> I[Incidents]
-    U --> L[Audit Logs]
-    A[Assets] --> V[Vulnerabilities]
+    U([👤 Users]) --> R[🎭 Roles]
+    R --> P[🔑 Permissions]
+    U --> I[🚨 Incidents]
+    U --> L[📜 Audit Logs]
+    A([💻 Assets]) --> V[🐞 Vulnerabilities]
     V --> I
     I --> L
     A --> L
+
+    classDef core fill:#1e293b,color:#f8fafc,stroke:#64748b
+    class U,R,P,I,L,A,V core
 ```
 
-The model is deliberately small enough to reason about and rich enough to produce real database and security problems.
+| Entity | Purpose |
+|---|---|
+| **Users** | Identities interacting with the platform |
+| **Roles / Permissions** | RBAC — the N:N relationship at the center of the privilege-escalation lab |
+| **Assets** | Systems/resources tracked by SecureCorp |
+| **Vulnerabilities** | Findings linked to assets — feeds the incident pipeline |
+| **Incidents** | Triggered by users or vulnerabilities |
+| **Audit Logs** | Immutable trail — every state change is observable |
 
 ---
 
-# 🟢 Phase 1 — BUILD
+## 🗄️ Data Model
 
-### Design before implementation
+```mermaid
+erDiagram
+    USERS ||--o{ USER_ROLES : has
+    ROLES ||--o{ USER_ROLES : assigned_to
+    ROLES ||--o{ ROLE_PERMISSIONS : grants
+    PERMISSIONS ||--o{ ROLE_PERMISSIONS : included_in
+    USERS ||--o{ INCIDENTS : reports
+    USERS ||--o{ AUDIT_LOGS : generates
+    ASSETS ||--o{ VULNERABILITIES : exposes
+    VULNERABILITIES ||--o{ INCIDENTS : triggers
+    INCIDENTS ||--o{ AUDIT_LOGS : logged_as
 
-The project begins with business rules, not random tables created until pgAdmin starts looking worried.
+    USERS {
+        uuid id PK
+        text username
+        text password_hash
+        timestamptz created_at
+    }
+    ROLES {
+        uuid id PK
+        text name
+    }
+    PERMISSIONS {
+        uuid id PK
+        text action
+    }
+    ASSETS {
+        uuid id PK
+        text name
+        text criticality
+    }
+    VULNERABILITIES {
+        uuid id PK
+        uuid asset_id FK
+        text cve_ref
+        text severity
+    }
+    INCIDENTS {
+        uuid id PK
+        uuid user_id FK
+        uuid vuln_id FK
+        text status
+    }
+    AUDIT_LOGS {
+        uuid id PK
+        uuid actor_id FK
+        text action
+        timestamptz occurred_at
+    }
+```
+
+`MCD → MLD` documentation for this schema lives in [`docs/mcd.md`](docs/mcd.md) and [`docs/mld.md`](docs/mld.md), with source diagrams under [`diagrams/`](diagrams/).
+
+---
+
+## 📂 Repository Structure
+
+```text
+securecorp-db/
+│
+├── .github/                          # CI / workflow configuration
+│
+├── app/                              # Application layer (Flask / CLI) — vulnerable + hardened variants
+│
+├── database/                         # Schema, constraints, seed data, DB roles
+│
+├── diagrams/
+│   ├── MCD_Project_Sentinel_V1.drawio
+│   ├── Mcd secops completed_v2.drawio
+│   └── .gitkeep
+│
+├── docs/
+│   ├── business-requirements.md      # Functional & security requirements
+│   ├── decisions.md                  # Architecture Decision Records (ADR-style)
+│   ├── mcd.md                        # Conceptual data model
+│   └── mld.md                        # Logical data model
+│
+├── exploits/                         # Proof-of-concept exploit scripts, one per vulnerability
+│
+├── report/                           # Evidence: before/after, EXPLAIN ANALYZE output, retest logs
+│
+├── .env.example                      # Environment variable template
+├── .gitignore
+├── docker-compose.yml                # PostgreSQL + app orchestration
+└── README.md
+```
+
+<details>
+<summary><strong>📌 Naming note (click to expand)</strong></summary>
+
+<br>
+
+The two `.drawio` files in `diagrams/` currently carry version suffixes and inconsistent casing/spacing (`MCD_Project_Sentinel_V1.drawio`, `Mcd secops completed_v2.drawio`). Git already tracks version history, so a single `mcd.drawio` (kept current via commits, not filename suffixes) would be more maintainable going forward — worth a quick rename pass before the repo is portfolio-facing.
+
+</details>
+
+---
+
+## 🟢 Phase 1 — Build
+
+Design precedes implementation. No table is created before the business rule behind it is written down.
 
 ```mermaid
 flowchart LR
-    A[Business Requirements] --> B[MCD]
-    B --> C[MLD]
-    C --> D[PostgreSQL Schema]
-    D --> E[Seed Data]
-    E --> F[Application]
+    A[📋 Business\nRequirements] --> B[🧩 MCD]
+    B --> C[⚙️ MLD]
+    C --> D[🐘 PostgreSQL\nSchema]
+    D --> E[🌱 Seed Data]
+    E --> F[🖥️ Application]
 ```
 
-### MCD → MLD → PostgreSQL
+**Conceptual model defines:** entities · attributes · identifiers · associations · cardinalities · N:N relationships · association properties · historization
 
-The conceptual model defines:
-
-- entities
-- attributes
-- identifiers
-- associations
-- cardinalities
-- N:N relationships
-- association properties
-- historical information
-
-A typical N:N structure becomes an associative relation:
+**N:N → associative relation:**
 
 ```text
 ROLE  N ───────< ROLE_PERMISSION >─────── N  PERMISSION
 ```
 
-The relational model is then implemented with database-level integrity:
+**Enforced at the database level:**
 
-```text
-PRIMARY KEY
-FOREIGN KEY
-NOT NULL
-UNIQUE
-CHECK
-```
+`PRIMARY KEY` · `FOREIGN KEY` · `NOT NULL` · `UNIQUE` · `CHECK`
 
-### Build deliverables
+**Deliverables:**
 
-```text
-docs/business-requirements.md
-docs/mcd.md
-docs/mld.md
-docs/normalization.md
-database/schema.sql
-database/seed.sql
-diagrams/mcd.png
-diagrams/mld.png
-```
+- [x] `docs/business-requirements.md`
+- [x] `docs/mcd.md`
+- [x] `docs/mld.md`
+- [ ] `docs/normalization.md`
+- [ ] `database/schema.sql`
+- [ ] `database/seed.sql`
 
 ---
 
-# 🔴 Phase 2 — BREACH
+## 🔴 Phase 2 — Breach
 
-The application layer is intentionally vulnerable.
+The application layer is deliberately vulnerable. The target is our own lab, not third-party infrastructure — every exploit here runs against `localhost`.
 
-The goal is not to attack somebody else's infrastructure. The goal is to understand exactly how insecure application/database interactions fail inside our own laboratory.
+### 01 · SQL Injection
 
-## 01 · SQL Injection
+```mermaid
+sequenceDiagram
+    actor A as Attacker
+    participant App as Application
+    participant DB as PostgreSQL
 
-Unsafe flow:
-
-```text
-User Input
-   ↓
-String Concatenation
-   ↓
-SQL Parser
-   ↓
-Unexpected Query
-   ↓
-Database Impact
+    A->>App: input = " OR 1=1 --"
+    App->>App: query = "SELECT * FROM users WHERE name = '" + input + "'"
+    Note over App: ⚠️ String concatenation, no parameterization
+    App->>DB: Unexpected query executes
+    DB-->>App: Full table returned
+    App-->>A: Unauthorized data disclosure
 ```
 
-The lab covers:
+Covered manually before any automation: **error-based · UNION-based · boolean-blind · time-blind**. `sqlmap` is used only as an independent validation pass afterward, never as the discovery method.
 
-- Error-based SQL injection
-- UNION-based SQL injection
-- Boolean-based blind SQL injection
-- Time-based blind SQL injection
+### 02 · Race Condition
 
-Manual exploitation comes first. Automation such as `sqlmap` is used as independent validation.
+```mermaid
+sequenceDiagram
+    participant Req_A as Request A
+    participant Req_B as Request B
+    participant DB as Database
 
-## 02 · Race Condition
-
-A deliberately unsafe check-then-act operation creates a concurrency window:
-
-```text
-Request A ──► SELECT ──► CHECK ──► UPDATE
-Request B ──► SELECT ──► CHECK ──► UPDATE
-                       ▲
-                       │
-                   RACE WINDOW
+    Req_A->>DB: SELECT balance
+    Req_B->>DB: SELECT balance
+    Note over Req_A,Req_B: 🏁 Both read the same pre-update state
+    Req_A->>DB: CHECK balance >= amount ✅
+    Req_B->>DB: CHECK balance >= amount ✅
+    Req_A->>DB: UPDATE balance
+    Req_B->>DB: UPDATE balance
+    Note over DB: 💥 Double-spend — the race window
 ```
 
-This connects application behavior to:
+Connects application behavior directly to `transactions` · `MVCC` · `isolation levels` · `locking` · `concurrency`.
 
-`transactions · MVCC · isolation · locking · concurrency`
+### 03 · Excessive Privileges
 
-## 03 · Excessive Privileges
+```mermaid
+flowchart TB
+    APP[Application] --> ACC[Over-Provisioned\nDB Account]
+    ACC --> READ[Read]
+    ACC --> WRITE[Write]
+    ACC --> SENS[⚠️ Sensitive\nModification]
 
-The application initially receives more database permissions than it actually needs:
-
-```text
-                APPLICATION
-                     │
-                     ▼
-          OVER-PERSONED DB ACCOUNT
-                     │
-          ┌──────────┼──────────┐
-          ▼          ▼          ▼
-        READ       WRITE     SENSITIVE
-                             MODIFICATION
+    style ACC fill:#7f1d1d,color:#fff
+    style SENS fill:#ef4444,color:#fff
 ```
 
-The experiment demonstrates how a weak privilege boundary can increase the impact of application compromise.
+Demonstrates how a weak privilege boundary amplifies the blast radius of any single application compromise.
 
 ---
 
-# 🔵 Phase 3 — HARDEN
+## 🔵 Phase 3 — Harden
 
-Hardening is not a sentence in a report saying “fixed.”
-
-The original attack is repeated.
+Hardening is not a sentence in a report saying "fixed." The original exploit is re-run against the patched system, and the result is recorded as evidence.
 
 ```mermaid
 flowchart LR
-    A[Vulnerable] --> B[Exploit]
+    A([Vulnerable]) --> B[Exploit]
     B --> C[Evidence]
     C --> D[Root Cause]
     D --> E[Remediation]
     E --> F[Repeat Attack]
-    F --> G[Blocked / Controlled]
-    G --> H[Proof]
+    F --> G{Blocked?}
+    G -->|Yes| H([✅ Proof])
+    G -->|No| D
+
+    style A fill:#7f1d1d,color:#fff
+    style H fill:#14532d,color:#fff
 ```
 
-### SQL Injection → Parameterized SQL
+<table>
+<tr>
+<th>Vulnerability</th>
+<th>Root Cause</th>
+<th>Fix</th>
+</tr>
+<tr>
+<td><strong>SQL Injection</strong></td>
+<td>User input concatenated into SQL text</td>
+<td>
 
 ```python
 query = "SELECT * FROM users WHERE name = %s"
 cursor.execute(query, (username,))
 ```
 
-The important thing is not the syntax. It is the separation between **data** and **SQL instructions**.
+Separates **data** from **instructions** — the actual fix, not the syntax.
 
-### Race Condition → Transactional Protection
-
-Depending on the state transition, the hardened implementation may use transactions, row locking, or an appropriate isolation strategy.
-
-Example:
+</td>
+</tr>
+<tr>
+<td><strong>Race Condition</strong></td>
+<td>Unprotected check-then-act sequence</td>
+<td>
 
 ```sql
 BEGIN;
-
-SELECT ...
-FOR UPDATE;
-
+SELECT ... FOR UPDATE;
 UPDATE ...;
-
 COMMIT;
 ```
 
-### Excessive Privilege → Least Privilege
+Row-level locking (or a stricter isolation level, depending on the state transition) closes the race window.
+
+</td>
+</tr>
+<tr>
+<td><strong>Excessive Privilege</strong></td>
+<td>One account, all permissions</td>
+<td>
 
 ```text
-app_readonly
-    ↓
-read-only operations
-
-app_write
-    ↓
-required DML only
-
-app_admin
-    ↓
-restricted administrative tasks
+app_readonly  → read-only operations
+app_write     → required DML only
+app_admin     → restricted admin tasks
 ```
 
-Each account should receive only the permissions necessary for its role.
+Each role receives only what its function requires.
+
+</td>
+</tr>
+</table>
 
 ---
 
-# 🧱 Defense in Depth
+## 🧱 Defense in Depth
 
-The application is not the only security boundary.
+```mermaid
+flowchart TB
+    A[Application Controls] --> F[🛡️ Defense in Depth]
+    B[Database Constraints] --> F
+    C[Transactions] --> F
+    D[Locks] --> F
+    E[Roles / Privileges] --> F
 
-The database also protects its own state:
-
-```text
-Application Controls
-        +
-Database Constraints
-        +
-Transactions
-        +
-Locks
-        +
-Roles / Privileges
-        ↓
-Defense in Depth
+    style F fill:#1e3a8a,color:#fff,stroke:#1e40af,stroke-width:2px
 ```
 
-The principle is simple:
-
-> **An application bug should not automatically become a valid database state.**
+> **An application bug should never automatically become a valid database state.**
 
 ---
 
-# 🔬 Performance Validation
+## 🔬 Performance Validation
 
-Security controls are tested without pretending performance is someone else's problem.
+Security controls are validated, not assumed — performance is measured, not guessed at.
 
-Key queries will be examined with:
-
-```sql
-EXPLAIN ANALYZE
+```mermaid
+flowchart LR
+    M[📏 Measure] --> O[👁️ Observe] --> R[🧠 Reason] --> C[🔧 Change] --> M
 ```
 
-Changes are driven by measurement:
-
-```text
-Measure
-  ↓
-Observe
-  ↓
-Reason
-  ↓
-Change
-  ↓
-Re-measure
-```
-
-Indexes are introduced when evidence supports them, not because a project contains the word “database.”
+`EXPLAIN ANALYZE` drives every indexing decision. Indexes are added when the query plan justifies them — not because the project happens to contain the word "database."
 
 ---
 
-# 🧪 Laboratory Boundaries
-
-All offensive testing is designed for the local, intentionally vulnerable environment.
-
-```text
-localhost / private lab
-        ↓
-fictional data
-        ↓
-intentional vulnerabilities
-        ↓
-controlled evidence
-```
-
-No real personal data or third-party infrastructure is required.
-
----
-
-# 🛠️ Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Database | PostgreSQL |
-| Application | Python + Flask / minimal CLI |
-| Driver | psycopg / psycopg2 |
-| Infrastructure | Docker + Docker Compose |
-| DB clients | `psql`, pgAdmin, DBeaver |
-| Security testing | Manual testing, sqlmap |
-| HTTP testing | Burp Suite Community |
-| Modeling | Merise MCD / MLD |
-| Version control | Git + GitHub |
-| Documentation | Markdown |
+| 🐘 Database | PostgreSQL |
+| 🐍 Application | Python + Flask / minimal CLI |
+| 🔌 Driver | psycopg / psycopg2 |
+| 🐳 Infrastructure | Docker + Docker Compose |
+| 🧭 DB Clients | `psql`, pgAdmin, DBeaver |
+| 🎯 Security Testing | Manual testing, sqlmap |
+| 🌐 HTTP Testing | Burp Suite Community |
+| 📐 Modeling | Merise MCD / MLD |
+| 🔀 Version Control | Git + GitHub |
+| 📝 Documentation | Markdown + Mermaid |
 
 ---
 
-# 📁 Repository
+## 🚀 Running the Lab
 
-```text
-securecorp-db/
-│
-├── README.md
-├── docker-compose.yml
-├── .env.example
-├── .gitignore
-│
-├── docs/
-│   ├── business-requirements.md
-│   ├── mcd.md
-│   ├── mld.md
-│   ├── normalization.md
-│   └── decisions.md
-│
-├── database/
-│   ├── schema.sql
-│   └── seed.sql
-│
-├── diagrams/
-│   ├── mcd.png
-│   └── mld.png
-│
-├── app/
-├── exploits/
-├── tests/
-├── report/
-└── assets/
-    └── securecorp-lifecycle.gif
+```mermaid
+flowchart LR
+    A[git clone] --> B[cp .env.example .env] --> C[docker compose up -d] --> D[docker compose ps] --> E[Connect via psql]
 ```
-
----
-
-# 🚀 Run the Lab
-
-Once the environment is implemented:
 
 ```bash
 git clone <repository-url>
@@ -405,140 +438,135 @@ docker compose up -d
 docker compose ps
 ```
 
-Then connect to PostgreSQL with the configured credentials.
-
-The exact environment variables, ports, startup sequence, and initialization behavior will live in the repository documentation.
+Exact environment variables, ports, and startup sequence live in [`docs/business-requirements.md`](docs/business-requirements.md) and `.env.example`.
 
 ---
 
-# 📊 What the project proves
+## 🎓 Learning Objectives
 
-```text
-                 SECURECORP DB
-                       │
-        ┌──────────────┼──────────────┐
-        ▼              ▼              ▼
-      DESIGN         ATTACK         DEFENSE
-        │              │              │
-     MCD / MLD      SQLi / Race     Params / TX
-        │           Privilege Esc.   Least Priv.
-        └──────────────┼──────────────┘
-                       ▼
-                    RETEST
-                       │
-                       ▼
-                     PROOF
+<table>
+<tr><td width="25%" valign="top">
+
+**🗄️ Database Engineering**
+
+- Requirements analysis
+- Merise MCD/MLD
+- Relational design & keys
+- Cardinalities, N:N
+- Historization
+- Normalization
+- PostgreSQL DDL
+- Integrity constraints
+
+</td><td width="25%" valign="top">
+
+**📊 SQL**
+
+- `SELECT` / `JOIN`
+- `GROUP BY`
+- Subqueries
+- `CASE`
+- CTEs
+- Window functions
+- Transactions & locking
+- `EXPLAIN ANALYZE`
+
+</td><td width="25%" valign="top">
+
+**🔓 Offensive Security**
+
+- SQL injection (all 4 classes)
+- Blind SQLi
+- Race conditions
+- Excessive DB privileges
+- App/DB trust boundaries
+- Integrity failures
+
+</td><td width="25%" valign="top">
+
+**🛡️ Defensive Engineering**
+
+- Parameterized SQL
+- Transactional protection
+- Least privilege
+- Constraints as controls
+- Defense in depth
+- Security regression testing
+
+</td></tr>
+</table>
+
+---
+
+## 🧭 Roadmap
+
+```mermaid
+flowchart TD
+    m1[01 · Business Model] --> m2[02 · MCD / MLD]
+    m2 --> m3[03 · PostgreSQL Live]
+    m3 --> m4[04 · Seed Data]
+    m4 --> m5[05 · Vulnerable App]
+    m5 --> m6[06 · First Exploit]
+    m6 --> m7[07 · Race Condition]
+    m7 --> m8[08 · Privilege Escalation]
+    m8 --> m9[09 · Hardening]
+    m9 --> m10[10 · Retest]
+    m10 --> m11[11 · Performance]
+    m11 --> m12[12 · Final Report]
+
+    style m1 fill:#166534,color:#fff
+    style m2 fill:#166534,color:#fff
+    style m3 fill:#166534,color:#fff
+    style m4 fill:#78716c,color:#fff
+    style m5 fill:#78716c,color:#fff
+    style m6 fill:#78716c,color:#fff
+    style m7 fill:#78716c,color:#fff
+    style m8 fill:#78716c,color:#fff
+    style m9 fill:#78716c,color:#fff
+    style m10 fill:#78716c,color:#fff
+    style m11 fill:#78716c,color:#fff
+    style m12 fill:#78716c,color:#fff
 ```
 
-The final result should let another engineer clone the project, understand the model, run the vulnerable lab, reproduce the documented issues, inspect the fixes, and verify the hardened state.
+> Green = complete based on current `docs/` contents. Update the styling as milestones close.
 
 ---
 
-# 🎓 Learning Objectives
+## ✅ Definition of Done
 
-## Database Engineering
-
-Requirements analysis, Merise MCD/MLD, relational design, keys, cardinalities, N:N relationships, historization, normalization, PostgreSQL DDL, integrity constraints, realistic seed data, and query analysis.
-
-## SQL
-
-`SELECT` · `JOIN` · `GROUP BY` · subqueries · `CASE` · CTEs · window functions · transactions · locking · `EXPLAIN ANALYZE`
-
-## Cybersecurity
-
-SQL injection, blind SQL injection, race conditions, excessive database privileges, application/database trust boundaries, and integrity failures.
-
-## Defensive Engineering
-
-Parameterized SQL, transactional protection, least privilege, constraints, defense in depth, and security regression testing.
-
----
-
-# 🧭 Milestones
+The project is complete when another engineer can, without asking a single question:
 
 ```text
-01  BUSINESS MODEL
-      ↓
-02  MCD / MLD
-      ↓
-03  POSTGRES LIVE
-      ↓
-04  SEED DATA
-      ↓
-05  VULNERABLE APP
-      ↓
-06  FIRST EXPLOIT
-      ↓
-07  RACE CONDITION
-      ↓
-08  PRIVILEGE ESCALATION
-      ↓
-09  HARDENING
-      ↓
-10  RETEST
-      ↓
-11  PERFORMANCE
-      ↓
-12  FINAL REPORT
+clone → start → inspect → understand → exploit →
+collect evidence → harden → retest → measure → verify
 ```
+
+The finish line is **not** "the tables exist." It is **reproducibility + exploitation + remediation + verification.**
 
 ---
 
-# ✅ Definition of Done
+## 🔐 Final Principle
 
-The project is complete when another engineer can:
+<div align="center">
 
-```text
-clone
-  ↓
-start
-  ↓
-inspect
-  ↓
-understand
-  ↓
-exploit
-  ↓
-collect evidence
-  ↓
-harden
-  ↓
-retest
-  ↓
-measure
-  ↓
-verify
+```
+DESIGN → IMPLEMENT → MEASURE → BREAK → UNDERSTAND → HARDEN → RETEST → PROVE
 ```
 
-The finish line is therefore not “the tables exist.”
+**The database is the system.**
+**The attack is the experiment.**
+**The fix is the engineering.**
+**The retest is the proof.**
 
-It is **reproducibility + exploitation + remediation + verification**.
+<br>
 
----
+<sub>SecureCorp DB · Build → Breach → Harden</sub>
 
-# 🔐 Final Principle
+</div>
 
-```text
-DESIGN
-  ↓
-IMPLEMENT
-  ↓
-MEASURE
-  ↓
-BREAK
-  ↓
-UNDERSTAND
-  ↓
-HARDEN
-  ↓
-RETEST
-  ↓
-PROVE
-```
-
-> **The database is the system.**  
-> **The attack is the experiment.**  
-> **The fix is the engineering.**  
-> **The retest is the proof.**
-
-<p align="center"><sub>SecureCorp DB · Build → Breach → Harden</sub></p>
+<!--
+Optional dynamic badges — replace OWNER/REPO and uncomment:
+![Last Commit](https://img.shields.io/github/last-commit/OWNER/REPO?style=flat-square)
+![Repo Size](https://img.shields.io/github/repo-size/OWNER/REPO?style=flat-square)
+![License](https://img.shields.io/github/license/OWNER/REPO?style=flat-square)
+-->
