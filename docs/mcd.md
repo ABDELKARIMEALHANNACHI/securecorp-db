@@ -199,12 +199,4 @@ erDiagram
 
 ---
 
-## 4. Known gaps (not yet resolved in the model)
 
-- **`ROLE_PERMISSION`** still has placeholder text instead of real attributes.
-- **`VULNERABILITY_ASSET`**'s PK is typo'd (`vuln_assest`) in the source file.
-- **`ASSET_TAG.tag_name`** duplicates data already owned by `TAG`.
-- **`ROLE_ASSIGNMENT.granted_by`** is a person but has no drawn relationship to `USER` (same pattern as `changed_by` / `verified_by` elsewhere).
-- **Row 1** (`USER`–`ASSET`) has no confirmed business meaning — it's the one relationship in the diagram that was never labeled.
-
-Say which of these you want tackled next and I'll fold it into the diagram.
