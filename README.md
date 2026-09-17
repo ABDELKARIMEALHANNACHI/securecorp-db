@@ -23,7 +23,6 @@
 ![Status](https://img.shields.io/badge/Status-Phase%201%20·%20Build-yellow?style=for-the-badge)
 ![Security Lab](https://img.shields.io/badge/Type-Offensive%20%2B%20Defensive%20Lab-critical?style=for-the-badge)
 
-<sub>⚠️ Static badges above are safe to keep as-is. If you want live GitHub stats (stars, last commit, issues), replace <code>OWNER/REPO</code> in the badge URLs at the bottom of this file with your actual GitHub path.</sub>
 
 </div>
 
